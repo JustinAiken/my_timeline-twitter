@@ -1,0 +1,11 @@
+<h3> Twitter Settings </h3>
+<% if @user.settings(:twitter).user_name %>
+  <%= button_to "Scrape tweets from #{@user.settings(:twitter).user_name}!", twitter_scrape_path, method: :get, class: "btn btn-primary" %>
+<% else %>
+  <%= form_tag new_twitter_path, method: :post do %>
+    <%= label_tag :user_name %>
+    <%= text_field_tag :user_name %>
+    <br>
+    <%= submit_tag "Save username", class: "btn btn-primary"  %>
+  <% end %>
+<% end %>
