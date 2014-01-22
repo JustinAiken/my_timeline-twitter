@@ -12,22 +12,6 @@ module MyTimeline
         @tweet_hash = tweet_hash
         return false if already_exists_in_db?
 
-        event = MyTimeline::Event.create(
-          happened_on:   tweet_hash.created_at,
-          original_id:   tweet_hash.id,
-          external_link: "http://twitter.com/#{user.settings(:twitter).user_name}/status/#{tweet_hash.id}",
-          icon_name:     "tweetweet_hash.png",
-          importance:    5,
-          public:        1,
-          description:   linkup_mentions_and_hashtags
-        )
-
-        tweet = MyTimeline::Twitter::Tweet.new(
-         happened_on: tweet_hash.created_at,
-         uri:         tweet_hash.id,
-         post:        tweet_hash.text
-        )
-
         event.linkable = tweet
         event.user = user if MyTimeline.user_class
         event.save
@@ -37,6 +21,26 @@ module MyTimeline
       end
 
     private
+
+      def event
+        @event ||= MyTimeline::Event.create(
+          happened_on:   tweet_hash.created_at,
+          original_id:   tweet_hash.id,
+          external_link: "http://twitter.com/#{user.settings(:twitter).user_name}/status/#{tweet_hash.id}",
+          icon_name:     "tweetweet_hash.png",
+          importance:    5,
+          public:        1,
+          description:   linkup_mentions_and_hashtags
+        )
+      end
+
+      def tweet
+        @tweet ||= MyTimeline::Twitter::Tweet.new(
+         happened_on: tweet_hash.created_at,
+         uri:         tweet_hash.id,
+         post:        tweet_hash.text
+        )
+      end
 
       def already_exists_in_db?
         MyTimeline::Twitter::Tweet.find_by_uri tweet_hash.id
